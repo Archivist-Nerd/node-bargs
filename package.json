@@ -1,0 +1,37 @@
+{
+  "name": "@archivistnerd/bargs",
+  "version": "0.1.2",
+  "description": "Archivist Nerd's bargs Package",
+  "copy": "Copyright (c) 2020 Archivist-Nerd",
+  "main": "src/bargs.js",
+  "scripts": {
+    "example": "node examples/example.js",
+    "test": "node tests/test.js",
+    "pack": "npm pack",
+    "pub": "npm publish --access=public"
+  },
+  "keywords": [
+    "Archivist",
+    "Nerd"
+  ],
+  "homepage": "https://github.com/Archivist-Nerd/node-bargs/blob/main/README.md",
+  "bugs": {
+    "url": "https://github.com/Archivist-Nerd/node-bargs/issues"
+  },
+  "repository": {
+    "url": "https://github.com/Archivist-Nerd/node-bargs.git",
+    "type": "git"
+  },
+  "author": {
+    "name": "Archivist Nerd",
+    "email": "a.Nerd.Archivist@gmail.com",
+    "url": "https://github.com/Archivist-Nerd"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@archivistnerd/testlib": "^0.1.1"
+  },
+  "dependencies": {
+    "@archivistnerd/args": "^0.1.1"
+  }
+}
