@@ -19,8 +19,8 @@ let bargs = {
       details: {
         name:   args.argv.$0,
         usage:  '',
-        options: [],
-        commands: [
+        commands: [],
+        options: [
           ['help','show help']
         ],
       }
@@ -176,12 +176,11 @@ bargs.option = ( option,desc,handler=()=>{} )=>{
  * @api:Example:
  *      bargs.displayHelp();
  */
-bargs.displayHelp = () => {
+bargs.displayHelp = ( commands='', options='') => {
   // process commands
-  let commands = ''
-    , options  = `Options:\n`
-    , usage    = bargs.details.usage.replace('%NAME%', bargs.details.name )
+  let usage    = bargs.details.usage.replace('%NAME%', bargs.details.name )
     ;
+  console.log('---',bargs.details.commands)
   bargs.details.commands.forEach( cmd =>{
     commands += `  ${cmd[0]}${spaces.substr(0,minCmd-cmd[0].length)} ${cmd[1].join(' ')}\t${cmd[2]}\n`
   })
@@ -189,7 +188,7 @@ bargs.displayHelp = () => {
     options += `  --${cmd[0]}${spaces.substr(0,minOpt-cmd[0].length)} ${cmd[1]}\n`
   })
   // display help
-  console.log(`${bargs.details.name}\n\n${usage}\n\nCommands:\n${commands}\n${options}`)
+  console.log(`${bargs.details.name}\n\n${usage}\n\n${(commands)? 'Commands:\n'+commands:''}\n${ (options)? 'Options:\n'+options:''}`)
   return bargs
 }
 /**
