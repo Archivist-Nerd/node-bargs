@@ -56,6 +56,25 @@ require('@archivistnerd/testlib')
                       }
         )
         /**
+         * @test:attempt      .option
+         */
+        .add(
+          `.option`,
+          ()       => {
+                        let bargs = require('../.')
+                          , result = false
+                          ;
+                        bargs.args('hehe --burp')
+                        bargs.option('hehe', 'this should not be ran',
+                                ()=>{ result=false }
+                              )
+                        bargs.option('burp', 'it worked :)',
+                                ()=>{ result=true }
+                              )
+                        return result
+                      }
+        )
+        /**
          * @test:attempt      .command('serve [port] [host] [path] [cache-file]', 'Serve Local Path') )
          */
         .add(
@@ -109,6 +128,49 @@ require('@archivistnerd/testlib')
                                   { name: 'host',      type: 'string', default: '127.0.0.1', describe: 'Host Address' },
                                   { name: 'path',      type: 'string', default: './',        describe: 'Local Path to serve' },
                                   { name: 'cacheFile', type: 'string',                       describe: 'cache filename' },
+                                ]
+                              )
+                        return result
+                      }
+        )
+        /**
+         * @test:attempt      default command )
+         */
+        .add(
+          `.command -- default commands`,
+          ()       => {
+                        let bargs = require('../.')
+                          , result = false
+                          ;
+                        bargs.args('serve2 80')
+                        bargs.command('serve [port] [host]', 'Serve Local Path',
+                                (args)=>{ 
+                                      result=false
+                                    }
+                              , [
+                                  { name: 'port',      type: 'number', default: '8080',      describe: 'Port to listen on' },
+                                  { name: 'host',      type: 'string', default: '127.0.0.1', describe: 'Host Address' },
+                                  { name: 'path',      type: 'string', default: './',        describe: 'Local Path to serve' },
+                                  { name: 'cacheFile', type: 'string',                       describe: 'cache filename' },
+                                ]
+                              )
+                        bargs.command('serve2 [port] [host]', 'Serve Local Path',
+                                (args)=>{ 
+                                      result=false
+                                    }
+                              , [
+                                  { name: 'port',      type: 'number', default: '8080',      describe: 'Port to listen on' },
+                                  { name: 'host',      type: 'string', default: '127.0.0.1', describe: 'Host Address' },
+                                  { name: 'path',      type: 'string', default: './',        describe: 'Local Path to serve' },
+                                  { name: 'cacheFile', type: 'string',                       describe: 'cache filename' },
+                                ]
+                              )
+                        bargs.command('$ [argument]', 'default command',
+                                (args)=>{ 
+                                      result=true
+                                    }
+                              , [
+                                  { name: 'argument', type: 'string', describe: 'argument' },
                                 ]
                               )
                         return result

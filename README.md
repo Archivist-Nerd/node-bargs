@@ -35,6 +35,20 @@ bargs
       .command('validate', 'validate local path', (args)=>{
         // this command has no arguments
       })
+      // test for option
+      .option('burp', 'display "burp"', (args)=>{
+        console.log('burp')
+      }
+      // default Command
+      .command('$ [argument]', 'display argument', (args)=>{
+        if ( args.argument !== undefined){
+          bargs.displayHelp()
+          return false;
+        }
+        console.log( args.argument )
+      }
+      , [ { name: 'argument', type: 'string', describe: 'argument' } ]
+      )
       // display help if no commands are executed
       .help()
       ;

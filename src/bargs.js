@@ -19,11 +19,15 @@ let bargs = {
       details: {
         name:   args.argv.$0,
         usage:  '',
-        commands: [],
+        options: [],
+        commands: [
+          ['help','show help']
+        ],
       }
     }
   , commandsRan=0
-  , minLen=10
+  , minCmd=10
+  , minOpt=10
   ;
 /**
  * @api:name    scriptName  Sets the script name displayed in help
@@ -72,13 +76,14 @@ bargs.args = ( _args='' )=>{
   bargs.argv = args.process( _args )
   // reset internal variables
   commandsRan = 0
-  minLen = 10
+  minCmd = 10
+  minOpt = 10
   bargs.details.commands = []
-
+  bargs.details.options  = [ ['help','show help'] ]
   return bargs
 }
 /**
- * @api:name    scriptName  Sets the script name displayed in help
+ * @api:name    command  test for a valid command to run
  * @api:group   function
  *
  * @api:Param    {String}   should be a string representing the command
@@ -95,19 +100,29 @@ bargs.args = ( _args='' )=>{
  *                { name: 'path',      type: 'string', default: './',        describe: 'Local Path to serve' },
  *                { name: 'cacheFile', type: 'string', default: '',          describe: 'cache filename' },
  *            ])
+ *
+ * @api:Example:
+ *      bargs.command('$ [build file]', 'build file location', 
+ *              (argv) => console.log( 'default command:\t',argv.buildFile )
+ *             ,[
+ *                { name: 'buildFile', type: 'string', describe: 'cache filename' },
+ *            ])
  */
 bargs.command = ( cmd,desc,handler=()=>{},builder=[] )=>{
   let _options = cmd.trim().split(' ')
     , _cmd     = _options.shift()
     ;
-  // store details for help
-  bargs.details.commands.push([_cmd,_options,desc])
-  if (_cmd.length>minLen) minLen=_cmd.length+1
-
-  if (bargs.argv._.length == 0   ) return bargs
-  if (bargs.argv._[0]     != _cmd) return bargs
-  // run command
-  bargs.argv._.shift()             // remove command
+  if (cmd=='') return bargs
+  // store details for help (if not $)
+  if ( _cmd !== '$' ) bargs.details.commands.push([_cmd,_options,desc])
+  if ( _cmd.length>minCmd ) minCmd=_cmd.length+1
+  // test if command should be blank
+  if ( _cmd !== '$' ){
+    if ( bargs.argv._.length == 0 ) return bargs
+    if ( bargs.argv._[0] != _cmd) return bargs
+    // run command
+    bargs.argv._.shift()             // remove command
+  }
   // process builder options
   if (Array.isArray(builder)) builder.forEach( option=>{
     let _type = (option.type)? option.type:'string'
@@ -127,6 +142,57 @@ bargs.command = ( cmd,desc,handler=()=>{},builder=[] )=>{
   return bargs
 }
 /**
+ * @api:name    option  test if --{option} is not !false or undefined
+ * @api:group   function
+ *
+ * @api:Param    {String}   should be a string representing the option name
+ * @api:Param    {String}   provide a description for this option your application accepts
+ * @api:Param    {Function} function, which will be executed with the parsed argv object
+ *
+ * @api:Example:
+ *      bargs.option('test', 'a simple test', 
+ *              (argv) => console.log( 'option "test" confirmed!' )
+ *            )
+ */
+bargs.option = ( option,desc,handler=()=>{} )=>{
+  let val     = bargs.argv[ option.trim().split(' ') ]
+    ;
+  if (option=='') return bargs
+  // store details for help
+  bargs.details.options.push([ option,desc ])
+  if ( option.length>minOpt ) minOpt=option.length+1
+
+  if ( val == false || val == undefined) return bargs
+  if (typeof handler == 'function') handler( bargs.argv )
+
+  commandsRan++
+
+  return bargs
+}
+/**
+ * @api:name    displayHelp  always displays the help message
+ * @api:group   functions
+ *
+ * @api:Example:
+ *      bargs.displayHelp();
+ */
+bargs.displayHelp = () => {
+  // process commands
+  let commands = ''
+    , options  = `Options:\n`
+    , usage    = bargs.details.usage.replace('%NAME%', bargs.details.name )
+    ;
+  bargs.details.commands.forEach( cmd =>{
+    commands += `  ${cmd[0]}${spaces.substr(0,minCmd-cmd[0].length)} ${cmd[1].join(' ')}\t${cmd[2]}\n`
+  })
+  bargs.details.options.forEach( cmd =>{
+    options += `  --${cmd[0]}${spaces.substr(0,minOpt-cmd[0].length)} ${cmd[1]}\n`
+  })
+  // display help
+  console.log(`${bargs.details.name}\n\n${usage}\n\nCommands:\n${commands}\n${options}`)
+  return bargs
+}
+/**
  * @api:name    help  
  * @api:group   functions
  *
@@ -137,18 +203,8 @@ bargs.command = ( cmd,desc,handler=()=>{},builder=[] )=>{
  */
 bargs.help = ( show=false ) =>{
   if ( !show && (commandsRan>0) ) return bargs
-  // process commands
-  let commands = ''
-    , options  = ''
-    , usage    = bargs.details.usage.replace('%NAME%', bargs.details.name )
-//    , options  = `Options:\n  --help     Show help                           [boolean]`
-    ;
-  bargs.details.commands.forEach( cmd =>{
-    commands += `  ${cmd[0]}${spaces.substr(0,minLen-cmd[0].length)} ${cmd[1].join(' ')}\t${cmd[2]}\n`
-  })
-  // display help
-  console.log(`${bargs.details.name}\n\n${usage}\n\nCommands:\n${commands}\n${options}`)
-  return bargs
+
+  return bargs.displayHelp()
 }
 /**
  *     export bargs variable

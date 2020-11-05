@@ -14,3 +14,9 @@ Archivist Nerd's Simple tool for command line interfaces
 |           |          |           | .help( Boolean ) |
 | 201101.06 |**v0.1.1**| **removed** | *.tgz files in package |
 | 201101.07 |**v0.1.2**| **modified** | .help |
+| 201105.00 |**v0.1.3**| **modified** | .command |
+|           |          |              |    command name $ for default command without a name (only 1 per app) |
+|           |          | **added** | .option |
+|           |          |           |    runs provided call back function if option is not "undefined" or "false" |
+|           |          |           | .displayHelp |
+|           |          |           |    always displays the help information |
